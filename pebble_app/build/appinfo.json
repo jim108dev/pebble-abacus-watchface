@@ -1,0 +1,27 @@
+{
+    "targetPlatforms": [
+        "aplite"
+    ], 
+    "displayName": "pebble-abacus-watchface", 
+    "name": "pebble-abacus-watchface", 
+    "messageKeys": {
+        "dummy": 10000
+    }, 
+    "companyName": "MakeAwesomeHappen", 
+    "enableMultiJS": true, 
+    "versionLabel": "1.0", 
+    "capabilities": [], 
+    "sdkVersion": "3", 
+    "appKeys": {
+        "dummy": 10000
+    }, 
+    "longName": "pebble-abacus-watchface", 
+    "shortName": "pebble-abacus-watchface", 
+    "watchapp": {
+        "watchface": true
+    }, 
+    "resources": {
+        "media": []
+    }, 
+    "uuid": "3546d2be-e62e-4583-b2bc-7fc9473bafe2"
+}

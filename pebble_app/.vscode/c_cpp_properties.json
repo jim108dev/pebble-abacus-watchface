@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Pebble SDK (Aplite)",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/home/a/.pebble-sdk/SDKs/4.3/sdk-core/pebble/aplite/include",
+                "${workspaceFolder}/build/include",
+                "${workspaceFolder}/build/aplite"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "/home/a/opt/pebble-dev/pebble-sdk-4.6-rc2-linux64/arm-cs-tools/bin/arm-none-eabi-gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++11",
+            "intelliSenseMode": "gcc-arm"
+        }
+    ],
+    "version": 4
+}
