@@ -1,7 +1,7 @@
 #include <pebble.h>
 
 static Layer *s_day_layer;
-static Layer *s_month_layer;
+static Layer *s_mon_layer;
 static Layer *s_hour_layer;
 static Layer *s_min_layer;
 static Layer *s_window_layer;
@@ -35,7 +35,8 @@ static void draw_bead(GContext *ctx, GRect bounds){
   
   GRect fill_bounds = GRect(bounds.origin.x + PADDING, bounds.origin.y + PADDING, bounds.size.w - 2*PADDING, bounds.size.h - 2*PADDING);
   graphics_draw_rect(ctx, fill_bounds);
-
+  
+  graphics_context_set_fill_color(ctx, GColorWhite);
   int corner_radius = 10;
   graphics_fill_rect(ctx, fill_bounds, corner_radius, GCornersAll);
 }
@@ -114,11 +115,17 @@ static void update_min(Layer *layer, GContext *ctx)  {
   draw_digits(layer, ctx, tick_time->tm_min);
 }
 
-static void date_tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-    layer_mark_dirty(s_date_layer);
+static void day_tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+    layer_mark_dirty(s_day_layer);
 }
-static void time_tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-    layer_mark_dirty(s_time_layer);
+static void mon_tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+    layer_mark_dirty(s_mon_layer);
+}
+static void hour_tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+    layer_mark_dirty(s_hour_layer);
+}
+static void min_tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+    layer_mark_dirty(s_min_layer);
 }
 
 static void main_window_load(Window *window) {
@@ -131,8 +138,8 @@ static void main_window_load(Window *window) {
     int16_t box_h = bounds.size.h/2 - 4;
     s_day_layer = layer_create(GRect(bounds.origin.x, bounds.origin.y, box_w, box_h ));
     s_mon_layer = layer_create(GRect(bounds.origin.x + box_w, bounds.origin.y , box_w, box_h ));
-    s_mon_layer = layer_create(GRect(bounds.origin.x, bounds.origin.y + box_h + 8 , box_w, box_h ));
-    s_mon_layer = layer_create(GRect(bounds.origin.x + box_w, bounds.origin.y + box_h + 8 , box_w, box_h ));
+    s_hour_layer = layer_create(GRect(bounds.origin.x, bounds.origin.y + box_h + 8 , box_w, box_h ));
+    s_min_layer = layer_create(GRect(bounds.origin.x + box_w, bounds.origin.y + box_h + 8 , box_w, box_h ));
 
     layer_add_child(s_window_layer, s_day_layer);
     layer_add_child(s_window_layer, s_mon_layer);
@@ -140,8 +147,9 @@ static void main_window_load(Window *window) {
     layer_add_child(s_window_layer, s_min_layer);
 
     layer_set_update_proc(s_day_layer, &update_day);
-    layer_set_update_proc(s_day_layer, &update_day);
-    layer_set_update_proc(s_time_layer, &update_time);
+    layer_set_update_proc(s_mon_layer, &update_mon);
+    layer_set_update_proc(s_hour_layer, &update_hour);
+    layer_set_update_proc(s_min_layer, &update_min);
 }
 
 static void main_window_unload(Window *window) {
@@ -162,7 +170,7 @@ static void init() {
   });
 
   tick_timer_service_subscribe(DAY_UNIT, day_tick_handler);
-  tick_timer_service_subscribe(MON_UNIT, mon_tick_handler);
+  tick_timer_service_subscribe(MONTH_UNIT, mon_tick_handler);
   tick_timer_service_subscribe(HOUR_UNIT, hour_tick_handler);
   tick_timer_service_subscribe(MINUTE_UNIT, min_tick_handler);
 
