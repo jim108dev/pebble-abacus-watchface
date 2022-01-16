@@ -1,11 +1,13 @@
 #include <pebble.h>
 
-static Layer *s_date_layer;
-static Layer *s_time_layer;
+static Layer *s_day_layer;
+static Layer *s_month_layer;
+static Layer *s_hour_layer;
+static Layer *s_min_layer;
 static Layer *s_window_layer;
 
 static Window *s_main_window;
-static uint8_t MAX_DIGITS = 4;
+static uint8_t MAX_DIGITS = 2;
 static uint8_t MAX_HEAVEN_BEAD_POSITIONS = 2;
 static uint8_t MAX_EARTH_BEAD_POSITIONS = 5;
 static uint8_t PADDING = 1;
@@ -82,22 +84,34 @@ static void draw_digits(Layer *layer, GContext *ctx, uint16_t num)  {
     }
 }
 
-static void update_date(Layer *layer, GContext *ctx)  {
+static void update_day(Layer *layer, GContext *ctx)  {
       
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
-  graphics_context_set_fill_color(ctx, GColorWhite);
 
-  draw_digits(layer, ctx, tick_time->tm_mday * ipow(10,2) + tick_time->tm_mon + 1);
+  draw_digits(layer, ctx, tick_time->tm_mday);
 }
 
-static void update_time(Layer *layer, GContext *ctx)  {
+static void update_mon(Layer *layer, GContext *ctx)  {
+      
   time_t temp = time(NULL);
   struct tm *tick_time = localtime(&temp);
 
-  graphics_context_set_fill_color(ctx, GColorWhite);
+  draw_digits(layer, ctx, tick_time->tm_mon + 1);
+}
 
-  draw_digits(layer, ctx, tick_time->tm_hour * ipow(10,2) + tick_time->tm_min);
+static void update_hour(Layer *layer, GContext *ctx)  {
+  time_t temp = time(NULL);
+  struct tm *tick_time = localtime(&temp);
+
+  draw_digits(layer, ctx, tick_time->tm_hour);
+}
+
+static void update_min(Layer *layer, GContext *ctx)  {
+  time_t temp = time(NULL);
+  struct tm *tick_time = localtime(&temp);
+
+  draw_digits(layer, ctx, tick_time->tm_min);
 }
 
 static void date_tick_handler(struct tm *tick_time, TimeUnits units_changed) {
@@ -113,20 +127,28 @@ static void main_window_load(Window *window) {
     s_window_layer = window_get_root_layer(window);
     GRect bounds = layer_get_unobstructed_bounds(s_window_layer);
 
+    int16_t box_w = bounds.size.w/2;
     int16_t box_h = bounds.size.h/2 - 4;
-    s_date_layer = layer_create(GRect(bounds.origin.x, bounds.origin.y, bounds.size.w, box_h ));
-    s_time_layer = layer_create(GRect(bounds.origin.x, bounds.origin.y + box_h + 8 , bounds.size.w, box_h ));
-    
-    layer_add_child(s_window_layer, s_date_layer);
-    layer_add_child(s_window_layer, s_time_layer);
+    s_day_layer = layer_create(GRect(bounds.origin.x, bounds.origin.y, box_w, box_h ));
+    s_mon_layer = layer_create(GRect(bounds.origin.x + box_w, bounds.origin.y , box_w, box_h ));
+    s_mon_layer = layer_create(GRect(bounds.origin.x, bounds.origin.y + box_h + 8 , box_w, box_h ));
+    s_mon_layer = layer_create(GRect(bounds.origin.x + box_w, bounds.origin.y + box_h + 8 , box_w, box_h ));
 
-    layer_set_update_proc(s_date_layer, &update_date);
+    layer_add_child(s_window_layer, s_day_layer);
+    layer_add_child(s_window_layer, s_mon_layer);
+    layer_add_child(s_window_layer, s_hour_layer);
+    layer_add_child(s_window_layer, s_min_layer);
+
+    layer_set_update_proc(s_day_layer, &update_day);
+    layer_set_update_proc(s_day_layer, &update_day);
     layer_set_update_proc(s_time_layer, &update_time);
 }
 
 static void main_window_unload(Window *window) {
-  layer_destroy(s_date_layer);
-  layer_destroy(s_time_layer);
+  layer_destroy(s_day_layer);
+  layer_destroy(s_mon_layer);
+  layer_destroy(s_hour_layer);
+  layer_destroy(s_min_layer);
 }
 
 static void init() {
@@ -139,8 +161,10 @@ static void init() {
     .unload = main_window_unload
   });
 
-  tick_timer_service_subscribe(DAY_UNIT, date_tick_handler);
-  tick_timer_service_subscribe(MINUTE_UNIT, time_tick_handler);
+  tick_timer_service_subscribe(DAY_UNIT, day_tick_handler);
+  tick_timer_service_subscribe(MON_UNIT, mon_tick_handler);
+  tick_timer_service_subscribe(HOUR_UNIT, hour_tick_handler);
+  tick_timer_service_subscribe(MINUTE_UNIT, min_tick_handler);
 
   // Show the Window on the watch, with animated=true
   window_stack_push(s_main_window, true);
