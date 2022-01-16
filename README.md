@@ -10,12 +10,14 @@ This is a learning project in order to create a Pebble app which displays date a
     git clone https://github.com/jim108dev/pebble-abacus-watchface.git
     ```
 
+1. Install Pebble: See [Native SDK install on Linux](https://willow.systems/blog/pebble-sdk-installation-guide/).
+
 1. Run on the emulator
 
     ```sh
     cd pebble_app
 
-    pebble build && pebble install --serial /dev/rfcomm0
+    pebble build && pebble install --logs --emulator aplite
     ```
 
 1. Run on the watch
